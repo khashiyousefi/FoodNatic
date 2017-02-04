@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>FoodNatic</title>
+    <%= csrf_meta_tags %>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <%= stylesheet_link_tag    "application", :media => "all" %>
+    <%= javascript_include_tag "application" %>
+
+  </head>
+
+
+  <body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="nav navbar-nav">
+            <%= link_to '<img class= "logo-in-nav" src="/logo-reverse-transparent.png" alt="Home"/>'.html_safe, welcome_index_path %>
+        </div>
+        <div>
+          <ul class="nav navbar-nav navbar-right">
+            <div>
+              <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown search-bar left">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                    <div class="advanced-dropdown" style="overflow-y: scroll">
+                      <%= form_tag users_search_path, :method => 'get' do %>
+                        <li> Health labels </li>
+                        <% Healthlabel.all.each do |hlabel| %>
+                          <% if searchableHealthLabels.include? hlabel.id %>
+                            <li class="advanced-params">
+                              <% if params["healthlabel_apiparameters"] %>
+                                <% if params["healthlabel_apiparameters"].include? hlabel.apiparameter %>
+                                    <%= check_box_tag 'healthlabel_apiparameters[]', hlabel.apiparameter, true %>
+                                <% else %>
+                                    <%= check_box_tag 'healthlabel_apiparameters[]', hlabel.apiparameter -%>
+                                <% end %>
+                              <% else %>
+                                  <%= check_box_tag 'healthlabel_apiparameters[]', hlabel.apiparameter -%>
+                              <% end %>
+                              <%= h hlabel.name -%>
+                            </li>
+                            <% end %>
+                        <%end%>
+                        <li> Diet labels </li>
+                        <% Dietlabel.all.each do |dlabel| %>
+                          <% if searchableDietLabels.include? dlabel.id %>
+                        <li class="advanced-params" >
+                          <%= check_box_tag 'dietlabel_apiparameters[]', dlabel.apiparameter -%>
+                          <%= h dlabel.name -%>
+                        </li>
+                        <% end %>
+                      <%end%>
+
+                      <li> Minimum Calories: <%= text_field_tag :mincalories, params[:mincalories] %> </li>
+                      <li> Maximum Calories: <%= text_field_tag :maxcalories, params[:maxcalories] %> </li>
+
+                      </div>
+                    </ul>
+                  </li> <!-- dropdown -->
+
+                <li class="search-bar left ">
+                  <%= text_field_tag :search, params[:search], class: "left form-inline" %>
+
+                  <%= submit_tag "Search", :name => nil, class: "btn btn-primary search-button"%>
+
+
+                  <% end %>
+                </li>
+
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Account<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <% if current_user %>
+                  <li class="submenu"><%= link_to "Settings", edit_user_path(current_user)%> <!--- TODO fix paths --></li>
+                  <li class="submenu"><%= link_to "Recommended Recipes", home_user_path(current_user) %></li>
+                  <li class="submenu"><%= link_to "Favorite Recipes",  my_recipes_user_path(current_user) %></li>
+                  <% if current_user.role == 2 %>
+                    <li class="submenu"><%= link_to "Admin Panel", users_adminhome_path %></li>
+                  <% end %>
+                  <li class="submenu"><%= link_to "About",  about_path %></li><br>
+
+                  <li class="submenu"><%= link_to "Log out", logout_path %></li>
+            	  <% else %>
+            	    <li class="submenu"><%= link_to "About",  about_path %></li>
+                  <li class="submenu"><%= link_to "Sign up", new_user_path %></li>
+                  <li class="submenu"><%= link_to "Log in", new_session_path %></li>
+                <% end %>
+              </ul>
+            </li> <!-- dropdown -->
+          </ul> <!-- nav navbar-nav navbar-right -->
+
+        </div>
+      </div>
+    </nav>
+
+
+  <div class="main-div">
+    <%= yield %>
+  </div>
+
+  </body>
+
+</html>
